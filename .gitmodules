@@ -4,3 +4,6 @@
 [submodule "assignments/totes-app/frontend"]
 	path = assignments/totes-app/frontend
 	url = https://github.com/asliAdarsh/totes-frontend.git
+[submodule "git-exercises/git-katas"]
+	path = git-exercises/git-katas
+	url = https://github.com/eficode-academy/git-katas.git
