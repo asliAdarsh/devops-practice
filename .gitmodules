@@ -1,0 +1,6 @@
+[submodule "assignments/totes-app/backend"]
+	path = assignments/totes-app/backend
+	url = https://github.com/asliAdarsh/totes-backend.git
+[submodule "assignments/totes-app/frontend"]
+	path = assignments/totes-app/frontend
+	url = https://github.com/asliAdarsh/totes-frontend.git
