@@ -20,7 +20,7 @@ devops-practice/
 ├── kubernetes-tasks/      # Kubernetes deployments & orchestration (3 tasks)
 ├── nginx-tasks/           # Nginx web server & reverse proxy (3 tasks)
 ├── terraform-practices/   # Terraform IaC with DigitalOcean
-└── assignments/           # End-to-end project: Todo & Notes App
+└── assignments/           # End-to-end project: Totes App (Todo & Notes)
 ```
 
 ---
@@ -84,7 +84,7 @@ Terraform Infrastructure-as-Code using the DigitalOcean provider:
 - Reusable Terraform modules with variables
 
 ### 📋 [assignments](./assignments)
-Full-stack **Todo & Notes App** — the capstone project:
+Full-stack **Totes App (Todo & Notes)** — the capstone project:
 - **Backend:** FastAPI + SQLAlchemy + PostgreSQL (containerized)
 - **Frontend:** React + Vite + Nginx (multi-stage Docker build)
 - **Orchestration:** Docker Compose for local dev

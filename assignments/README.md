@@ -1,4 +1,4 @@
-# Assignments — Todo & Notes App
+# Assignments — Totes App (Todo & Notes)
 
 ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
 ![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -8,7 +8,7 @@
 ![Azure](https://img.shields.io/badge/Azure-App_Service-0078D4?style=flat-square&logo=microsoftazure&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white)
 
-This is the **capstone project** — a full-stack **Todo & Notes** application that combines all the DevOps tools and practices learned throughout this repository. It demonstrates the entire lifecycle from development to production deployment.
+This is the **capstone project** — a full-stack **Totes (Todo & Notes)** application that combines all the DevOps tools and practices learned throughout this repository. It demonstrates the entire lifecycle from development to production deployment.
 
 ---
 
@@ -50,8 +50,8 @@ This is the **capstone project** — a full-stack **Todo & Notes** application t
 ## 📁 Project Structure
 
 ```
-todo-notes-app/
-├── backend/                    # FastAPI Python backend
+totes-app/
+├── backend/                    # FastAPI Python backend (Git submodule → totes-backend)
 │   ├── main.py                 # API endpoints + DB models
 │   ├── dockerfile              # Docker image for backend
 │   ├── requirements.txt        # Python dependencies
@@ -61,7 +61,7 @@ todo-notes-app/
 │   │   └── cd.yml              # Backend CD: deploy to Azure App Service
 │   └── todos.db                # Local SQLite fallback
 │
-├── frontend/                   # React + Vite frontend
+├── frontend/                   # React + Vite frontend (Git submodule → totes-frontend)
 │   ├── src/
 │   │   ├── App.jsx             # Main app with routing
 │   │   ├── pages/TasksPage.jsx # Todo management page
@@ -119,7 +119,7 @@ todo-notes-app/
 ### Docker Compose (Local)
 
 ```bash
-cd assignments/todo-notes-app
+cd assignments/totes-app
 docker-compose up --build
 ```
 
@@ -192,7 +192,7 @@ kubectl apply -f deployment/ingress-routing.yaml
 on: push to main
 jobs:
   - Build Docker image
-  - Push to Docker Hub (asliadarsh/todo-backend:<sha>)
+  - Push to Docker Hub (asliadarsh/totes-backend:<sha>)
 ```
 
 ### Backend CD (`cd.yml`)
@@ -207,7 +207,7 @@ jobs:
 on: push to main
 jobs:
   - Build Docker image with VITE_API_URL build-arg
-  - Push to Docker Hub (asliadarsh/todo-frontend:<sha>)
+  - Push to Docker Hub (asliadarsh/totes-frontend:<sha>)
 ```
 
 ### Frontend CD (`cd.yml`)
@@ -229,6 +229,38 @@ Both frontend and backend are deployed to **Azure App Service**:
 
 ---
 
+## 📦 Git Submodules
+
+This project uses **Git submodules** to link the backend and frontend to their own GitHub repositories:
+
+| Component | GitHub Repo | Path |
+|-----------|-------------|------|
+| **Backend** | [asliAdarsh/totes-backend](https://github.com/asliAdarsh/totes-backend) | `assignments/totes-app/backend` |
+| **Frontend** | [asliAdarsh/totes-frontend](https://github.com/asliAdarsh/totes-frontend) | `assignments/totes-app/frontend` |
+
+### Cloning with Submodules
+
+```bash
+# Clone the parent repo with all submodules
+git clone --recurse-submodules <repo-url>
+
+# Or if already cloned, initialize submodules
+git submodule update --init --recursive
+```
+
+### Updating Submodules
+
+```bash
+# Pull latest changes in all submodules
+git submodule update --remote --merge
+
+# Or update a specific submodule
+cd assignments/totes-app/backend
+git pull origin main
+```
+
+---
+
 ## Skills Demonstrated
 
 ### DevOps
@@ -238,6 +270,7 @@ Both frontend and backend are deployed to **Azure App Service**:
 - ✅ GitHub Actions CI/CD pipelines
 - ✅ Cloud deployment to Azure App Service
 - ✅ Docker Hub image registry management
+- ✅ Git submodule management for component separation
 
 ### Development
 - ✅ FastAPI backend with SQLAlchemy ORM
@@ -260,3 +293,4 @@ Both frontend and backend are deployed to **Azure App Service**:
 - ✅ Cloud deployment to Azure
 - ✅ Secrets management in CI/CD and Kubernetes
 - ✅ Multi-stage build optimization
+- ✅ Git submodule setup and management
