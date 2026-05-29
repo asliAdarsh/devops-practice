@@ -1,0 +1,14 @@
+# ==============================================
+# Task 8: Named Volumes - Data Persistence
+# Appends timestamps to a file on each run
+# ==============================================
+FROM alpine:latest
+
+# Create the data directory
+RUN mkdir -p /data
+
+# Copy and make executable the entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

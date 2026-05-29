@@ -1,0 +1,19 @@
+# ==============================================
+# Task 17: Docker Swarm Demo - Web App
+# ==============================================
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy the app
+COPY app.py .
+
+# Expose the port
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python", "/app/app.py"]

@@ -1,0 +1,16 @@
+# ==============================================
+# Task 9: Custom Networks - Flask API Service
+# ==============================================
+FROM python:3.11-alpine
+
+# Install Flask
+RUN pip install flask
+
+# Copy the app
+COPY app.py /app.py
+
+# Expose the API port
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python", "/app.py"]

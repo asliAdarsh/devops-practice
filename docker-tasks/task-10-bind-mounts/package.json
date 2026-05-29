@@ -1,0 +1,9 @@
+{
+    "name": "bind-mounts-demo",
+    "version": "1.0.0",
+    "description": "Docker bind mounts demonstration with live reload",
+    "main": "app.js",
+    "dependencies": {
+        "express": "^4.18.2"
+    }
+}

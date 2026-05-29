@@ -1,0 +1,28 @@
+# ==============================================
+# Task 16: Local Docker Registry Demo
+# Run a private registry and push/pull images
+# ==============================================
+version: "3.8"
+
+services:
+  # --- Local Docker Registry ---
+  registry:
+    image: registry:2
+    container_name: local-registry
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry_data:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+
+  # --- Sample app to push to the registry ---
+  sample-app:
+    build: .
+    container_name: sample-app-builder
+    # This service is just for building - we don't run it via compose
+    profiles:
+      - build-only
+
+volumes:
+  registry_data:

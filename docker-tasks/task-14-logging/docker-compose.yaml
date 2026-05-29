@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

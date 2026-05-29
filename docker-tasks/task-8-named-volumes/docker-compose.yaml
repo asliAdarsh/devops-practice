@@ -1,0 +1,19 @@
+# ==============================================
+# Task 8: Named Volumes Demo
+# Data persists across container restarts
+# ==============================================
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: volume-demo
+    # Mount the named volume at /data inside the container
+    volumes:
+      - app_data:/data
+
+# Define the named volume
+volumes:
+  app_data:
+    # Docker will create this volume automatically
+    # Use `docker volume inspect task-8-named-volumes_app_data` to see details

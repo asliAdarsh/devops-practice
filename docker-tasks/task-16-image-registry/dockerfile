@@ -1,0 +1,12 @@
+# ==============================================
+# Task 16: Image Registry Demo - Sample App
+# A simple Nginx page to push to local registry
+# ==============================================
+FROM nginx:alpine
+
+# Copy a simple HTML page
+COPY index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+
+# No CMD needed - nginx:alpine starts nginx automatically

@@ -1,0 +1,15 @@
+# ==============================================
+# Task 7: Ephemeral Filesystem Demo
+# Shows that container data is lost on removal
+# ==============================================
+FROM alpine:latest
+
+# Create a data directory where we'll store files
+RUN mkdir -p /data
+
+# Copy a startup script into the container
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Run the script when container starts
+CMD ["/entrypoint.sh"]

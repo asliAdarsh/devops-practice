@@ -1,0 +1,11 @@
+# ==============================================
+# Task 7: Ephemeral Filesystem Demo
+# No volumes defined - data disappears with container
+# ==============================================
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: ephemeral-demo
+    # No volumes! Data will be lost when container is removed

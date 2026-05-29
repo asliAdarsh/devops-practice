@@ -1,0 +1,32 @@
+# ==============================================
+# Task 17: Docker Swarm Stack File
+# Defines a web service to deploy on the swarm
+# ==============================================
+version: "3.8"
+
+services:
+  web:
+    # Image name (build locally first with: docker build -t swarm-app .)
+    image: swarm-app
+    # Deploy configuration for the swarm
+    deploy:
+      replicas: 3                    # Run 3 copies of this service
+      update_config:
+        parallelism: 1               # Update 1 container at a time
+        delay: 10s                   # Wait 10s between updates
+        order: start-first           # Start new before stopping old (zero-downtime)
+      restart_policy:
+        condition: on-failure        # Restart if container exits with error
+        max_attempts: 3              # Max restart attempts
+      resources:
+        limits:
+          cpus: "0.5"                # Limit to 0.5 CPU cores
+          memory: 256M               # Limit to 256MB memory
+    ports:
+      - "8080:5000"                  # Map host:8080 to container:5000
+    networks:
+      - swarm-net
+
+networks:
+  swarm-net:
+    driver: overlay                  # Overlay network spans all swarm nodes

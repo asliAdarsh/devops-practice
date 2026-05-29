@@ -1,0 +1,16 @@
+# ==============================================
+# Task 13: Resource Limits Demo
+# Container that can stress-test resource limits
+# ==============================================
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+# Install stress testing tools
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Copy the stress script
+COPY stress.py .
+
+CMD ["python", "/stress.py"]

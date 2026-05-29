@@ -1,0 +1,16 @@
+# ==============================================
+# Task 6: Basic Nginx Server
+# Base image: nginx:alpine (tiny, ~23MB)
+# ==============================================
+FROM nginx:alpine
+
+# Copy our HTML file into Nginx's default web root
+# /usr/share/nginx/html is where Nginx looks for files by default
+COPY index.html /usr/share/nginx/html/index.html
+
+# Expose port 80 (Nginx's default port)
+# This is documentation - Docker won't publish the port without -p flag
+EXPOSE 80
+
+# No CMD needed - the parent nginx:alpine image already starts Nginx
+# The default CMD from nginx:alpine is: nginx -g 'daemon off;'
