@@ -8,7 +8,7 @@ variable "region" {
   default = "asia-south1"
 }
 
-variable "org_id"{
+variable "org_id" {
   type    = string
   default = "310558825488"
 }

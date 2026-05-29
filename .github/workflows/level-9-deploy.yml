@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'terraform-practices/gcp-practice/level-9-pipeline/**'
-      - '.github/workflows/deploy.yml'
 
 jobs:
   terraform:
