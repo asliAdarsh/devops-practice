@@ -6,13 +6,13 @@ terraform {
       version = "~> 5.0"
     }
   }
-  backend "gcs"{
-  bucket = "footprint-bucket-dev-adarsh-sandbox-101"
-  prefix = "terraform/pipeline"
-}
+  backend "gcs" {
+    bucket = "footprint-bucket-dev-adarsh-sandbox-101"
+    prefix = "terraform/pipeline"
+  }
 }
 
 provider "google" {
-  project     = var.project_id
-  region      = var.region
+  project = var.project_id
+  region  = var.region
 }
