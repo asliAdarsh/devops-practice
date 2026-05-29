@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'terraform-practices/gcp-practice/level-9-pipeline/**'
+      - '.github/workflows/deploy.yml'
 
 jobs:
   terraform:
@@ -14,8 +15,6 @@ jobs:
 
     env:
       TF_VAR_project_id: "test-project-18792"
-      # FORCE TERRAFORM TO BYPASS LOCAL CONTAINER EXPIRED KEY CHECKS
-      GPG_BOGUS_KEY_WORKAROUND: "true"
 
     defaults:
       run:
@@ -29,12 +28,11 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
-
       - name: "3. Setup HashiCorp Terraform CLI"
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
-          terraform_wrapper: false # <--- CRUCIAL: Strips the broken wrapper layer out
+          terraform_version: 1.7.0
+          terraform_wrapper: false
 
       - name: "4. Configure Terraform Environment Wrapper"
         run: echo "TF_IN_AUTOMATION=true" >> $GITHUB_ENV
