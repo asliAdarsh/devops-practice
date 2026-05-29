@@ -11,15 +11,13 @@ jobs:
   terraform:
     name: "Automated Deploy Run"
     runs-on: ubuntu-latest
-
-    # Set the working environment location globally for all step commands
-    defaults:
-      run:
-        working-directory: terraform-practices/gcp-practice/level-9-pipeline
-
     env:
       TF_VAR_project_id: "test-project-18792"
       GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+    defaults:
+      run:
+        working-directory: terraform-practices/gcp-practice/level-9-pipeline
 
     steps:
       - name: "1. Checkout Source Code"
