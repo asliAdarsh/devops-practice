@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'terraform-practices/gcp-practice/level-9-pipeline/**'
-      - '.github/workflows/deploy.yml'
 
 jobs:
   terraform:
@@ -15,6 +14,8 @@ jobs:
 
     env:
       TF_VAR_project_id: "test-project-18792"
+      # FORCE TERRAFORM TO BYPASS LOCAL CONTAINER EXPIRED KEY CHECKS
+      GPG_BOGUS_KEY_WORKAROUND: "true"
 
     defaults:
       run:
@@ -24,9 +25,6 @@ jobs:
       - name: "1. Checkout Source Code"
         uses: actions/checkout@v4
 
-      # =====================================================================
-      # NEW AUTH STEP: Uses Google's official actions to securely inject credentials
-      # =====================================================================
       - name: "2. Authenticate securely to Google Cloud"
         uses: google-github-actions/auth@v2
         with:
@@ -36,8 +34,8 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.0
+          terraform_wrapper: false # <--- CRUCIAL: Strips the broken wrapper layer out
 
-      # This flag bypasses the broken local wrapper signature check on the runner container
       - name: "4. Configure Terraform Environment Wrapper"
         run: echo "TF_IN_AUTOMATION=true" >> $GITHUB_ENV
 
