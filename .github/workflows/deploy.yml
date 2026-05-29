@@ -1,0 +1,43 @@
+name: "Terraform Cloud Automation Pipeline"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform-practices/gcp-practice/level-9-pipeline/**'
+
+jobs:
+  terraform:
+    name: "Automated Deploy Run"
+    runs-on: ubuntu-latest
+
+    # Set the working environment location globally for all step commands
+    defaults:
+      run:
+        working-directory: terraform-practices/gcp-practice/level-9-pipeline
+
+    env:
+      TF_VAR_project_id: "test-project-18792"
+      GOOGLE_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+
+    steps:
+      - name: "1. Checkout Source Code"
+        uses: actions/checkout@v4
+
+      - name: "2. Setup HashiCorp Terraform CLI"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: "3. Check Code Formatting Syntax"
+        run: terraform fmt -check
+
+      - name: "4. Initialize State Connection"
+        run: terraform init
+
+      - name: "5. Validate Code Integrity Structure"
+        run: terraform validate
+
+      - name: "6. Execute Automated Run"
+        run: terraform apply -auto-approve

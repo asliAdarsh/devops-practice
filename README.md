@@ -15,10 +15,10 @@ A personal hands-on repository documenting my DevOps learning journey. This repo
 
 ```
 devops-practice/
-├── docker-tasks/          # Docker containerization (5 tasks)
+├── docker-tasks/          # Docker containerization (17 tasks)
 ├── git-exercises/         # Git katas & version control exercises
-├── kubernetes-tasks/      # Kubernetes deployments & orchestration (3 tasks)
-├── nginx-tasks/           # Nginx web server & reverse proxy (3 tasks)
+├── kubernetes-tasks/      # Kubernetes deployments & orchestration (12 tasks incl. capstone)
+├── nginx-tasks/           # Nginx web server & reverse proxy (11 tasks)
 ├── terraform-practices/   # Terraform IaC with DigitalOcean
 └── assignments/           # End-to-end project: Totes App (Todo & Notes)
 ```
@@ -29,10 +29,10 @@ devops-practice/
 
 | Area | What I Practiced |
 |------|-----------------|
-| **🐳 Docker** | Containerizing Node.js, Python, React apps; multi-stage builds; Docker Compose; multi-container apps with Redis; security best practices (non-root users); Nginx + React SPA serving |
+| **🐳 Docker** | Containerizing Node.js, Python, React apps; multi-stage builds; Docker Compose; volumes & bind mounts; custom networks; health checks; resource limits; logging; multi-arch builds; image registry; Docker Swarm orchestration |
 | **🌿 Git** | Branching, merging, rebasing, stashing, cherry-pick, bisect, conflict resolution, interactive rebase, submodules, squashing, reflog, reset, revert, tags, attributes, hooks |
-| **☸️ Kubernetes** | Deployments, Services (ClusterIP, NodePort, LoadBalancer), ConfigMaps, Secrets, PersistentVolumeClaims, Pods, MongoDB + Mongo Express, PostgreSQL, Nginx, Ingress routing |
-| **🔁 Nginx** | Static file serving, reverse proxy configuration, Node.js app proxying, React SPA routing with `try_files`, custom nginx configs in Docker |
+| **☸️ Kubernetes** | Cluster setup, Pods, Deployments, Services (ClusterIP, NodePort, LoadBalancer), ConfigMaps, Secrets, PersistentVolumeClaims, Ingress, Horizontal scaling, Rolling updates, Service discovery, Block storage, Full capstone microservice |
+| **🔁 Nginx** | Static file serving, reverse proxy, SPA routing, load balancing, rate limiting, access control, security headers, caching, SSL/HTTPS, JSON logging, URL rewriting |
 | **🏗️ Terraform** | Infrastructure-as-Code with DigitalOcean provider, VPC creation, Droplet provisioning, firewalls, reusable modules, environment separation (dev/prod), `moved` blocks |
 | **🚀 CI/CD** | GitHub Actions workflows for Docker build & push, automated CI + CD pipelines, Azure App Service deployment |
 | **📦 Full-Stack Deployment** | FastAPI backend + React (Vite) frontend + PostgreSQL, containerized with Docker Compose, deployed on Kubernetes with Ingress |
@@ -54,27 +54,56 @@ cd devops-practice
 ## What's Inside Each Module
 
 ### 🐳 [docker-tasks](./docker-tasks)
-5 progressive Docker exercises:
+17 progressive Docker exercises:
 - **Task 1:** Node.js Express app with non-root security best practices
 - **Task 2:** Python FastAPI containerization
 - **Task 3:** Multi-container app (Node.js + Redis) using Docker Compose
 - **Task 4:** Multi-stage build — Vite + React + Nginx SPA serving
 - **Task 5:** Multi-stage build — Create React App with Nginx
+- **Task 6:** Basic Nginx static file server
+- **Task 7:** Ephemeral filesystem (data loss demonstration)
+- **Task 8:** Named volumes for data persistence
+- **Task 9:** Custom Docker networks
+- **Task 10:** Bind mounts for live development
+- **Task 11:** Persistent volumes with PostgreSQL
+- **Task 12:** Container health checks
+- **Task 13:** CPU and memory resource limits
+- **Task 14:** Logging and debugging
+- **Task 15:** Multi-architecture builds with Buildx
+- **Task 16:** Local Docker image registry
+- **Task 17:** Docker Swarm orchestration
 
 ### 🌿 [git-exercises](./git-exercises)
 A collection of Git katas (exercises) covering ~40+ Git scenarios — from basic commits to advanced interactive rebase, bisect, submodules, and merge drivers. Each kata has its own setup script and README.
 
 ### ☸️ [kubernetes-tasks](./kubernetes-tasks)
-3 Kubernetes practice scenarios:
-- **Task 1:** MongoDB + Mongo Express with ConfigMaps, Secrets, and Services
-- **Task 2:** PostgreSQL with PersistentVolumeClaim and Nginx Deployment
-- **Task 3:** Ingress routing configuration
+12 Kubernetes practice scenarios (incl. capstone):
+- **Task 1:** ConfigMaps & Secrets — MongoDB + Mongo Express
+- **Task 2:** Persistent Storage — PostgreSQL with PVC
+- **Task 3:** Ingress — path-based routing
+- **Task 4:** Cluster setup with Minikube
+- **Task 5:** Basic Pods — YAML fundamentals
+- **Task 6:** Deployments & self-healing
+- **Task 7:** Service discovery & DNS
+- **Task 8:** Horizontal scaling (replicas)
+- **Task 9:** Rolling updates & rollbacks
+- **Task 10:** LoadBalancer Services
+- **Task 11:** Block storage with PVCs
+- **Task 12:** Capstone — Full microservice (Frontend + Backend + MongoDB)
 
 ### 🔁 [nginx-tasks](./nginx-tasks)
-3 Nginx configuration exercises:
-- **Task 1:** Simple static file serving via Nginx + Docker
-- **Task 2:** Nginx as a reverse proxy for a Node.js app
-- **Task 3:** React app built and served with Nginx (production deployment)
+11 Nginx configuration exercises:
+- **Task 1:** Static file serving with Nginx + Docker
+- **Task 2:** Reverse proxy for a Node.js app
+- **Task 3:** React SPA fallback routing with `try_files`
+- **Task 4:** Load balancing across multiple backends
+- **Task 5:** Rate limiting
+- **Task 6:** Access control with HTTP Basic Auth
+- **Task 7:** Security headers (CSP, HSTS, X-Frame-Options)
+- **Task 8:** Performance caching (proxy_cache)
+- **Task 9:** SSL/HTTPS with self-signed certificates
+- **Task 10:** JSON structured logging
+- **Task 11:** URL rewriting & redirects
 
 ### 🏗️ [terraform-practices](./terraform-practices)
 Terraform Infrastructure-as-Code using the DigitalOcean provider:
