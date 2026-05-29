@@ -1,0 +1,76 @@
+# ============================================================
+# hpa.yaml — HorizontalPodAutoscaler
+# ============================================================
+# The HPA automatically adjusts the number of pod replicas
+# based on observed CPU and/or memory utilization.
+#
+# API group: autoscaling
+# Version: v2 (preferred) or v1 (legacy, CPU only)
+# ============================================================
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+
+metadata:
+  # name: The HPA resource name
+  name: web-app-hpa
+  labels:
+    app: web-app
+    project: hpa-demo
+
+spec:
+  # --- scaleTargetRef ---
+  # What resource to scale. Usually a Deployment or StatefulSet.
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-app
+
+  # --- minReplicas & maxReplicas ---
+  # The scaling boundaries
+  minReplicas: 2   # Never scale below this
+  maxReplicas: 10  # Never scale above this
+
+  # --- metrics ---
+  # The metrics to watch. HPA will try to keep ALL metrics
+  # at or below their targets.
+  metrics:
+    # --- CPU Utilization ---
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          # type: Utilization = percentage of the requested CPU
+          # type: AverageValue = absolute value (e.g., 100m)
+          type: Utilization
+          # averageUtilization: Target CPU usage across all pods
+          # If average CPU exceeds 50%, HPA scales up
+          averageUtilization: 50
+
+    # --- Memory Utilization (optional) ---
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: Utilization
+    #       averageUtilization: 80
+
+  # --- behavior (optional) ---
+  # Fine-tune how fast the HPA scales up and down
+  behavior:
+    # Scale up quickly (default 3-4 min evaluation period)
+    scaleUp:
+      stabilizationWindowSeconds: 0     # No delay before scaling up
+      policies:
+        - type: Percent
+          value: 100    # Can double the pod count per evaluation
+          periodSeconds: 15
+    # Scale down slowly to avoid thrashing
+    scaleDown:
+      # stabilizationWindowSeconds: How long to wait before scaling down
+      # Default is 300 seconds (5 minutes)
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 50     # Can halve the pod count per evaluation
+          periodSeconds: 60

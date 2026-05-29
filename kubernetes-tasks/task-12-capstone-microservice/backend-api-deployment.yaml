@@ -1,0 +1,133 @@
+# ============================================================
+# backend-api-deployment.yaml — Backend API + Service
+# ============================================================
+# A lightweight backend API (using node.js + express)
+# that connects to PostgreSQL and serves API endpoints.
+# ============================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  labels:
+    app: capstone
+    tier: backend
+    component: api
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: backend-api
+
+  # --- Rolling Update Strategy ---
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime
+
+  template:
+    metadata:
+      labels:
+        app: backend-api
+        tier: backend
+    spec:
+      containers:
+        - name: api
+          # Using a simple Node.js API image
+          image: node:18-alpine
+          ports:
+            - containerPort: 8080
+              name: http
+
+          # --- Command: Start a simple HTTP server ---
+          # This creates a basic API using Node.js built-in http module
+          command: ["node", "-e"]
+          args:
+            - |
+              const http = require('http');
+              const server = http.createServer((req, res) => {
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                if (req.url === '/api/health') {
+                  res.end(JSON.stringify({status: 'ok', service: 'backend-api', timestamp: new Date().toISOString()}));
+                } else if (req.url.startsWith('/api/')) {
+                  res.end(JSON.stringify({message: 'API endpoint', path: req.url}));
+                } else {
+                  res.end(JSON.stringify({message: 'Backend API is running'}));
+                }
+              });
+              server.listen(8080, () => console.log('API server running on port 8080'));
+
+          # --- Environment Variables from ConfigMap and Secret ---
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-password
+            - name: PORT
+              value: "8080"
+
+          # --- Resource Requests/Limits ---
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+
+          # --- Probes ---
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+
+---
+# --- Backend API Service (ClusterIP) ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-api
+  labels:
+    app: capstone
+    tier: backend
+spec:
+  selector:
+    app: backend-api
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      name: http

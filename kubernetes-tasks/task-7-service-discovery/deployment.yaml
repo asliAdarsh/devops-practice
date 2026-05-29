@@ -1,0 +1,53 @@
+# ============================================================
+# deployment.yaml — Simple Web App Deployment
+# ============================================================
+# A basic web application (Nginx) that we'll expose via a
+# ClusterIP Service for DNS-based service discovery.
+# ============================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+    tier: frontend
+
+spec:
+  # replicas: Starting with 3 pods to show load balancing
+  replicas: 3
+
+  # selector: Match pods with label "app: web-app"
+  selector:
+    matchLabels:
+      app: web-app
+
+  # template: Pod specification
+  template:
+    metadata:
+      labels:
+        app: web-app  # MUST match selector.matchLabels
+    spec:
+      containers:
+        - name: nginx
+          # Using a custom index page via environment variable
+          # would require a custom image; for simplicity, we use
+          # the default nginx which shows the welcome page
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          # --- Readiness Probe ---
+          # Ensures the pod only receives traffic when it's ready
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          # --- Liveness Probe ---
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,56 @@
+# ============================================================
+# storageclass.yaml — Custom StorageClass (Optional)
+# ============================================================
+# A StorageClass defines different "classes" of storage:
+# - fast: SSD-backed, high IOPS
+# - standard: HDD-backed, balanced
+# - slow: Cold storage, archival
+#
+# On Minikube, the default "standard" StorageClass uses the
+# k8s.io/minikube-hostpath provisioner. This file creates
+# a custom "fast" StorageClass for demonstration.
+#
+# In real cloud environments, this would reference the
+# appropriate CSI driver (e.g., ebs.csi.aws.com for AWS EBS).
+# ============================================================
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+
+metadata:
+  # name: The StorageClass name used in PVC's storageClassName field
+  name: fast
+
+# --- provisioner ---
+# The CSI driver that provisions the storage.
+# On Minikube, we use the built-in hostpath provisioner.
+# On AWS: ebs.csi.aws.com
+# On GCP: pd.csi.storage.gke.io
+# On Azure: disk.csi.azure.com
+provisioner: k8s.io/minikube-hostpath
+
+# --- parameters ---
+# Depending on the provisioner, different parameters are available.
+# For example, on AWS EBS:
+#   type: gp3          # SSD
+#   iopsPerGB: "10"
+#   encrypted: "true"
+parameters:
+  # For minikube-hostpath, there are no special parameters
+  # type: pd-ssd   # Example for GCP
+
+# --- reclaimPolicy ---
+# What happens to the PV when the PVC is deleted:
+# Delete → PV is deleted (default, data gone)
+# Retain → PV is kept (data preserved, manual cleanup needed)
+# Recycle → PV is scrubbed and made available again (deprecated)
+reclaimPolicy: Delete
+
+# --- allowVolumeExpansion ---
+# Whether the PVC can be expanded (increased in size) later
+allowVolumeExpansion: true
+
+# --- mountOptions ---
+# Additional options passed to the mount command
+# mountOptions:
+#   - debug

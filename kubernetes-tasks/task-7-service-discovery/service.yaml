@@ -1,0 +1,47 @@
+# ============================================================
+# service.yaml — ClusterIP Service for DNS Discovery
+# ============================================================
+# This Service provides a stable IP and DNS name for the
+# web-app pods. Other pods can reach it using the service
+# name "web-service" as a DNS hostname.
+#
+# DNS format: <service-name>.<namespace>.svc.cluster.local
+# Within the same namespace, you can use just <service-name>
+# ============================================================
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  # name: This becomes the DNS name!
+  name: web-service
+  labels:
+    app: web-app
+    project: service-discovery
+
+spec:
+  # --- selector ---
+  # Routes traffic to pods with these labels
+  # MUST match the pod template labels in deployment.yaml
+  selector:
+    app: web-app
+
+  # --- type ---
+  # ClusterIP is the default. Options:
+  #   ClusterIP  → Internal only (default)
+  #   NodePort   → Exposes on each node's IP + port
+  #   LoadBalancer → Cloud LB (or minikube tunnel)
+  #   ExternalName → DNS alias
+  type: ClusterIP
+
+  # --- ports ---
+  # The list of ports this service exposes
+  ports:
+    # - name: A descriptive name for the port
+    - name: http
+      # protocol: TCP, UDP, or SCTP (default TCP)
+      protocol: TCP
+      # port: The port the service listens on (other pods connect here)
+      port: 80
+      # targetPort: The port on the container (where the app runs)
+      targetPort: 80

@@ -1,0 +1,99 @@
+# ============================================================
+# deployment.yaml — Nginx Deployment with Self-Healing
+# ============================================================
+# A Deployment manages a ReplicaSet which ensures the desired
+# number of pods are always running. If a pod crashes or is
+# deleted, the ReplicaSet creates a new one immediately.
+#
+# Note the apiVersion difference from a plain Pod:
+#   Deployments use "apps/v1" (not "v1")
+# ============================================================
+
+# --- apiVersion ---
+# Deployments belong to the "apps" API group, not the core "v1" group
+apiVersion: apps/v1
+
+# --- kind ---
+kind: Deployment
+
+# --- metadata ---
+metadata:
+  # name: The name of the Deployment
+  name: nginx-deployment
+  # labels: Labels for the Deployment resource itself
+  labels:
+    app: nginx
+    tier: frontend
+    project: self-healing-demo
+
+# --- spec ---
+# The desired state for this Deployment
+spec:
+  # replicas: How many pod copies to run (the desired count)
+  replicas: 3
+
+  # selector: How the Deployment finds which pods to manage
+  # MUST match the labels in the pod template below
+  selector:
+    matchLabels:
+      app: nginx
+
+  # template: The pod template — describes what each pod should look like
+  template:
+    metadata:
+      # labels: MUST match selector.matchLabels above
+      labels:
+        app: nginx
+    spec:
+      containers:
+        # - name: Container name
+        - name: nginx-container
+          # image: Using alpine variant for smaller size
+          image: nginx:alpine
+          # ports: Expose port 80
+          ports:
+            - containerPort: 80
+
+          # --- Liveness Probe ---
+          # Kubernetes checks this endpoint periodically.
+          # If it fails, Kubernetes restarts the container.
+          livenessProbe:
+            # httpGet: Perform an HTTP GET request
+            httpGet:
+              path: /          # Nginx serves this by default
+              port: 80
+            # initialDelaySeconds: Wait before first check (let app start)
+            initialDelaySeconds: 5
+            # periodSeconds: Check every N seconds
+            periodSeconds: 10
+            # timeoutSeconds: How long to wait for a response
+            timeoutSeconds: 3
+            # failureThreshold: Number of failures before restarting
+            failureThreshold: 3
+
+          # --- Readiness Probe ---
+          # Similar to liveness, but controls if the pod receives traffic.
+          # If readiness fails, the pod is removed from Service endpoints
+          # but NOT restarted.
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          # --- Resources (recommended for production) ---
+          # resources:
+          #   requests:
+          #     memory: "64Mi"
+          #     cpu: "250m"
+          #   limits:
+          #     memory: "128Mi"
+          #     cpu: "500m"
+
+  # --- Update Strategy (optional, defaults to RollingUpdate) ---
+  # strategy:
+  #   type: RollingUpdate
+  #   rollingUpdate:
+  #     maxSurge: 1        # How many extra pods during update
+  #     maxUnavailable: 0  # How many pods can be down during update

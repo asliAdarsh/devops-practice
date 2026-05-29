@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  mongodb-host: mongodb-service
+  mongodb-port: "27017"
+  backend-host: backend-service
+  backend-port: "3000"

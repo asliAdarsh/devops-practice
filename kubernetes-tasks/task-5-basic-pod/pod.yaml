@@ -1,0 +1,58 @@
+# ============================================================
+# pod.yaml — A Simple Nginx Pod
+# ============================================================
+# This is a basic Kubernetes Pod definition.
+#
+# YAML Structure (ALL Kubernetes resources follow this):
+#   apiVersion  → Which API version to use
+#   kind        → What type of resource (Pod, Service, Deployment, etc.)
+#   metadata    → Name, labels, namespace, annotations
+#   spec        → The desired state (what should run)
+# ============================================================
+
+# --- apiVersion ---
+# For core resources like Pod, Service, ConfigMap, Secret, use "v1"
+# For Deployments, DaemonSets, StatefulSets, use "apps/v1"
+apiVersion: v1
+
+# --- kind ---
+# The type of resource. Case-sensitive! "Pod" not "pod".
+kind: Pod
+
+# --- metadata ---
+# Data that helps identify the object: name, labels, annotations, namespace
+metadata:
+  # name: Must be unique within the namespace. Lowercase, hyphen-separated.
+  name: my-first-pod
+  # labels: Key-value pairs for organizing and selecting resources
+  labels:
+    app: nginx
+    tier: frontend
+    project: learning-k8s
+
+# --- spec ---
+# The desired state of the resource. For a Pod, this defines containers.
+spec:
+  # containers: A list of containers to run in this pod
+  containers:
+    # - name: Container name (displayed in logs and exec commands)
+    - name: nginx-container
+      # image: The container image to pull from a registry (Docker Hub, etc.)
+      image: nginx:alpine
+      # ports: List of ports to expose from the container
+      ports:
+        # containerPort: The port the container listens on
+        - containerPort: 80
+          # protocol: TCP (default), UDP, or SCTP
+          protocol: TCP
+      # resources: CPU and memory limits/requests (optional for basic pod)
+      # resources:
+      #   requests:
+      #     memory: "64Mi"
+      #     cpu: "250m"
+      #   limits:
+      #     memory: "128Mi"
+      #     cpu: "500m"
+  # restartPolicy: When to restart the container
+  # Always = always restart (default), OnFailure = only on error, Never = don't restart
+  restartPolicy: Always

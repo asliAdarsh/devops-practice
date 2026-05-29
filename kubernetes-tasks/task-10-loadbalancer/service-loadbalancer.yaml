@@ -1,0 +1,51 @@
+# ============================================================
+# service-loadbalancer.yaml — LoadBalancer Service
+# ============================================================
+# A LoadBalancer Service exposes the application outside the
+# cluster. On Minikube, you need to run 'minikube tunnel'
+# in a separate terminal to get an external IP.
+#
+# On cloud providers (AWS, GCP, Azure), this automatically
+# provisions a cloud load balancer.
+# ============================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-lb-service
+  labels:
+    app: web-app
+    project: loadbalancer-demo
+
+spec:
+  # --- type: LoadBalancer ---
+  # This tells Kubernetes to provision an external load balancer.
+  # On Minikube, this requires 'minikube tunnel' to work.
+  type: LoadBalancer
+
+  # --- selector ---
+  # Route traffic to pods with these labels
+  selector:
+    app: web-app
+
+  # --- ports ---
+  ports:
+    - name: http
+      protocol: TCP
+      # port: The external port (what clients connect to)
+      port: 80
+      # targetPort: The container port (where nginx runs)
+      targetPort: 80
+      # nodePort: Optional — Kubernetes assigns one from 30000-32767
+      # If you specify one, it must be in the allowed range
+      # nodePort: 30080
+
+  # --- externalTrafficPolicy (optional) ---
+  # 'Local' preserves the client source IP (backend sees real client IP)
+  # 'Cluster' (default) may use SNAT (backend sees node IP)
+  # externalTrafficPolicy: Local
+
+  # --- sessionAffinity (optional) ---
+  # 'None' (default) → round-robin across pods
+  # 'ClientIP' → same client goes to same pod
+  # sessionAffinity: ClientIP

@@ -1,0 +1,57 @@
+# ============================================================
+# pod-with-volume.yaml — Pod with PVC Volume Mount
+# ============================================================
+# This pod mounts a PVC at /data. Any data written to /data
+# persists beyond the pod's lifecycle.
+# ============================================================
+
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: persistent-pod
+  labels:
+    app: storage-demo
+    project: csi-storage
+
+spec:
+  # --- containers ---
+  containers:
+    - name: alpine
+      # Alpine Linux — small image for testing file operations
+      image: alpine:latest
+      # Keep the container running (idle command)
+      command: ["sleep", "3600"]
+
+      # --- volumeMounts ---
+      # Mount volumes at specific paths inside the container
+      volumeMounts:
+        # - name: Must match a volume defined below
+        - name: persistent-storage
+          # mountPath: Where in the container to mount the volume
+          mountPath: /data
+          # readOnly: false (default) — pod can write to the volume
+          # readOnly: true — pod can only read from the volume
+
+      # --- resources ---
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "32Mi"
+        limits:
+          cpu: "100m"
+          memory: "64Mi"
+
+  # --- volumes ---
+  # Define the volumes available to this pod
+  volumes:
+    # - name: Must match volumeMounts[].name
+    - name: persistent-storage
+      # persistentVolumeClaim: Use a PVC as the volume source
+      persistentVolumeClaim:
+        claimName: my-pvc  # The PVC to use (must exist)
+        # readOnly: false
+
+  # --- restartPolicy ---
+  # Always restart if the pod exits
+  restartPolicy: Always

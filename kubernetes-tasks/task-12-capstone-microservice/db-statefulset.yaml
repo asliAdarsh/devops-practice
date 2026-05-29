@@ -1,0 +1,131 @@
+# ============================================================
+# db-statefulset.yaml — PostgreSQL StatefulSet + Service
+# ============================================================
+# StatefulSet is used for stateful applications like databases.
+# It provides:
+# - Stable network identity (pod name: postgres-db-0)
+# - Ordered pod creation and deletion
+# - Stable persistent storage per pod
+# ============================================================
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-db
+  labels:
+    app: capstone
+    tier: database
+    component: postgres
+
+spec:
+  # serviceName: The headless Service that controls the domain
+  serviceName: postgres-db
+
+  # replicas: Usually 1 for development (use 3+ with replication in prod)
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: postgres
+
+  # --- template ---
+  template:
+    metadata:
+      labels:
+        app: postgres
+        tier: database
+    spec:
+      containers:
+        - name: postgres
+          # Official PostgreSQL image from Docker Hub
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+              name: postgres-port
+
+          # --- Environment Variables ---
+          env:
+            # DB username from Secret
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-username
+            # DB password from Secret
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: db-password
+            # DB name from ConfigMap
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+            # Optional: set timezone
+            - name: TZ
+              value: UTC
+
+          # --- Volume Mounts ---
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+
+          # --- Resource Requests/Limits ---
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          # --- Probes ---
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - appuser
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - appuser
+            initialDelaySeconds: 20
+            periodSeconds: 15
+
+  # --- VolumeClaimTemplates ---
+  # StatefulSets use volumeClaimTemplates for per-pod PVCs
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+
+---
+# --- Headless Service ---
+# Headless (clusterIP: None) for StatefulSet DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db
+  labels:
+    app: capstone
+    tier: database
+spec:
+  selector:
+    app: postgres
+  # Headless — no load balancing, direct pod DNS
+  clusterIP: None
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432

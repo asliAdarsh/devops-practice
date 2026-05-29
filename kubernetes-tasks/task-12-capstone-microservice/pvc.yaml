@@ -1,0 +1,22 @@
+# ============================================================
+# pvc.yaml — Database PersistentVolumeClaim
+# ============================================================
+# Requests persistent storage for PostgreSQL data.
+# If the pod restarts, the data survives.
+# ============================================================
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  labels:
+    app: capstone
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  # Using the default StorageClass (typically "standard")
+  # storageClassName: standard
