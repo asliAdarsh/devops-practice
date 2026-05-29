@@ -1,0 +1,29 @@
+# ===========================================
+# Docker Compose: Nginx Security Headers Demo
+# ===========================================
+# Demonstrates hardening Nginx with security headers
+
+services:
+  # ---- Nginx with Security Headers ----
+  nginx:
+    build: .
+    container_name: nginx-security
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - security-network
+
+  # ---- Simple Backend Server ----
+  backend:
+    build: ./backend
+    container_name: security-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - security-network
+
+networks:
+  security-network:
+    driver: bridge

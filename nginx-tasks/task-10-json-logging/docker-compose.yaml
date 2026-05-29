@@ -1,0 +1,15 @@
+# ===========================================
+# Docker Compose: Nginx JSON Logging Demo
+# ===========================================
+# Demonstrates JSON-formatted access and error logs
+
+services:
+  # ---- Nginx with JSON Logging ----
+  nginx:
+    build: .
+    container_name: nginx-json-log
+    ports:
+      - "80:80"
+    # Mount a volume to access logs from the host
+    volumes:
+      - ./logs:/var/log/nginx

@@ -1,0 +1,29 @@
+# ===========================================
+# Docker Compose: Nginx Rate Limiting Demo
+# ===========================================
+# Shows how rate limiting protects backend services
+
+services:
+  # ---- Nginx with Rate Limiting ----
+  nginx:
+    build: .
+    container_name: nginx-ratelimit
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - ratelimit-network
+
+  # ---- Simple Backend Server ----
+  backend:
+    build: ./backend
+    container_name: ratelimit-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - ratelimit-network
+
+networks:
+  ratelimit-network:
+    driver: bridge

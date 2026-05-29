@@ -1,0 +1,18 @@
+# Use the official Nginx Alpine image (lightweight)
+FROM nginx:alpine
+
+# Install needed packages and create cache directory
+RUN mkdir -p /var/cache/nginx && \
+    chown -R nginx:nginx /var/cache/nginx
+
+# Remove the default Nginx configuration
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy our caching configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 for HTTP traffic
+EXPOSE 80
+
+# Run Nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]

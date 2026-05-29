@@ -1,0 +1,29 @@
+# ===========================================
+# Docker Compose: Nginx Caching Demo
+# ===========================================
+# Demonstrates how caching improves performance
+
+services:
+  # ---- Nginx with Caching ----
+  nginx:
+    build: .
+    container_name: nginx-cache
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - cache-network
+
+  # ---- Backend Server (with simulated slow responses) ----
+  backend:
+    build: ./backend
+    container_name: cache-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - cache-network
+
+networks:
+  cache-network:
+    driver: bridge

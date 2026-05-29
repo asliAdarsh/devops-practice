@@ -1,0 +1,54 @@
+# ===========================================
+# Docker Compose: Nginx Load Balancer + 3 Backends
+# ===========================================
+# This setup demonstrates horizontal scaling.
+# Nginx distributes requests across 3 backend instances.
+
+services:
+  # ---- Nginx Load Balancer ----
+  nginx:
+    build: .
+    container_name: nginx-lb
+    ports:
+      - "80:80"   # Expose Nginx on host port 80
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - lb-network
+
+  # ---- Backend Server Instance 1 ----
+  backend1:
+    build: ./backend
+    container_name: backend1
+    hostname: backend1   # Makes the server hostname visible in response
+    ports:
+      - "3001:3000"   # Host 3001 → Container 3000
+    networks:
+      - lb-network
+
+  # ---- Backend Server Instance 2 ----
+  backend2:
+    build: ./backend
+    container_name: backend2
+    hostname: backend2
+    ports:
+      - "3002:3000"   # Host 3002 → Container 3000
+    networks:
+      - lb-network
+
+  # ---- Backend Server Instance 3 ----
+  backend3:
+    build: ./backend
+    container_name: backend3
+    hostname: backend3
+    ports:
+      - "3003:3000"   # Host 3003 → Container 3000
+    networks:
+      - lb-network
+
+# Internal network for communication between containers
+networks:
+  lb-network:
+    driver: bridge

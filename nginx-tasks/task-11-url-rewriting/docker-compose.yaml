@@ -1,0 +1,12 @@
+# ===========================================
+# Docker Compose: Nginx URL Rewriting Demo
+# ===========================================
+# Demonstrates various URL rewrite and redirect techniques
+
+services:
+  # ---- Nginx with URL Rewriting ----
+  nginx:
+    build: .
+    container_name: nginx-rewrite
+    ports:
+      - "80:80"

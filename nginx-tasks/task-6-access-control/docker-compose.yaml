@@ -1,0 +1,29 @@
+# ===========================================
+# Docker Compose: Nginx Access Control Demo
+# ===========================================
+# Demonstrates IP allow/deny and Basic Authentication
+
+services:
+  # ---- Nginx with Access Control ----
+  nginx:
+    build: .
+    container_name: nginx-access-control
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - access-network
+
+  # ---- Simple Backend Server ----
+  backend:
+    build: ./backend
+    container_name: access-backend
+    ports:
+      - "3000:3000"
+    networks:
+      - access-network
+
+networks:
+  access-network:
+    driver: bridge
