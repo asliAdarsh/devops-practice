@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TF_VAR_project_id: "test-project-18792"
+      TF_VAR_project_id: "your-gcp-project-id"
       TF_VAR_billing_account_id: ${{ secrets.GCP_BILLING_ACCOUNT_ID }}
 
     defaults:

@@ -1,3 +1,3 @@
-project_id     = "test-project-18792"
+project_id     = "your-gcp-project-id"
 environment    = "prod"
-sandbox_suffix = "adarsh-sandbox-101"
+sandbox_suffix = "yourname-sandbox-101"

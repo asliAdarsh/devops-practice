@@ -19,7 +19,7 @@ devops-practice/
 ├── git-exercises/         # Git katas & version control exercises
 ├── kubernetes-tasks/      # Kubernetes deployments & orchestration (12 tasks incl. capstone)
 ├── nginx-tasks/           # Nginx web server & reverse proxy (11 tasks)
-├── terraform-practices/   # Terraform IaC with DigitalOcean
+├── terraform-practices/   # Terraform IaC with DigitalOcean & GCP (14 levels + modules)
 └── assignments/           # End-to-end project: Totes App (Todo & Notes)
 ```
 
@@ -33,7 +33,7 @@ devops-practice/
 | **🌿 Git** | Branching, merging, rebasing, stashing, cherry-pick, bisect, conflict resolution, interactive rebase, submodules, squashing, reflog, reset, revert, tags, attributes, hooks |
 | **☸️ Kubernetes** | Cluster setup, Pods, Deployments, Services (ClusterIP, NodePort, LoadBalancer), ConfigMaps, Secrets, PersistentVolumeClaims, Ingress, Horizontal scaling, Rolling updates, Service discovery, Block storage, Full capstone microservice |
 | **🔁 Nginx** | Static file serving, reverse proxy, SPA routing, load balancing, rate limiting, access control, security headers, caching, SSL/HTTPS, JSON logging, URL rewriting |
-| **🏗️ Terraform** | Infrastructure-as-Code with DigitalOcean provider, VPC creation, Droplet provisioning, firewalls, reusable modules, environment separation (dev/prod), `moved` blocks |
+| **🏗️ Terraform** | **DigitalOcean:** VPC creation, Droplet provisioning, firewalls, reusable modules, environment separation (dev/prod), `moved` blocks — **GCP (14 levels):** Local state, variables/backends, custom VPC, private compute, NAT, modules, Cloud SQL, CI/CD, project factories, Shared VPC, IAM, GitOps, Workload Identity Federation |
 | **🚀 CI/CD** | GitHub Actions workflows for Docker build & push, automated CI + CD pipelines, Azure App Service deployment |
 | **📦 Full-Stack Deployment** | FastAPI backend + React (Vite) frontend + PostgreSQL, containerized with Docker Compose, deployed on Kubernetes with Ingress |
 
@@ -106,11 +106,32 @@ A collection of Git katas (exercises) covering ~40+ Git scenarios — from basic
 - **Task 11:** URL rewriting & redirects
 
 ### 🏗️ [terraform-practices](./terraform-practices)
-Terraform Infrastructure-as-Code using the DigitalOcean provider:
-- Modular architecture (`network_layer`, `app_cluster`)
-- VPC, firewall, and Droplet provisioning
-- Development and production environments
-- Reusable Terraform modules with variables
+
+**Two cloud providers, two practice tracks:**
+
+#### ☁️ [DigitalOcean Practice](./terraform-practices/digital-ocean-practice)
+- **Provisioning**: VPC, Droplets, firewalls, tags via reusable modules
+- **Architecture**: 2 environments (dev + prod) with `network_layer` and `app_cluster` modules
+- **Concepts**: Multi-environment via variables, `moved` block refactoring, module composition
+- **Theme**: The Network Architect · The Compute Runner · The Orchestrator
+
+#### 🌐 [GCP Practice](./terraform-practices/gcp-practice) — 14 Progressive Levels
+| Level | Theme | What I Practiced |
+|-------|-------|------------------|
+| L1 | The Footprint | First GCS bucket, local state, provider handshake |
+| L2 | The Variable Lab | Variable separation, env validation, .tfvars layers |
+| L3 | The State Guardian | Remote GCS backend, state locking, migration |
+| L4 | The Network Architect | Custom VPC, private subnet, IAP SSH firewall |
+| L5 | The Fortress | Private VM (no public IP), data sources, IAP tunnel |
+| L6 | The Outbound Gate | Cloud Router + NAT, one-way outbound internet |
+| L7 | The Architect | Local modules, reusable gcp_bucket abstraction |
+| L8 | The Data Vault | Private Cloud SQL PostgreSQL, PSA, VPC peering |
+| L9 | The Pipeline | Monorepo CI/CD, path-filtered GitHub Actions |
+| L10 | The Factory | Org-level project factory (hub + spoke), random_id |
+| L11 | The Conduit | Shared VPC, provider aliasing, host/service project |
+| L12 | The Gatekeeper | Cross-project IAM, subnet-level least privilege |
+| L13 | The Guardian | GitOps PR pipeline, fmt-check, speculative plans |
+| L14 | The Master Key | Workload Identity Federation, OIDC, secretless auth |
 
 ### 📋 [assignments](./assignments)
 Full-stack **Totes App (Todo & Notes)** — the capstone project:
@@ -139,7 +160,13 @@ Full-stack **Totes App (Todo & Notes)** — the capstone project:
 - ✅ Multi-container orchestration with Docker Compose
 - ✅ Kubernetes resource management (Deployments, Services, Ingress, PVC, ConfigMaps, Secrets)
 - ✅ Nginx configuration (static serving, reverse proxy, SPA routing)
-- ✅ Infrastructure-as-Code with Terraform modules
+- ✅ Infrastructure-as-Code with Terraform modules (GCP + DigitalOcean)
+- ✅ GCP infrastructure: VPC, private compute, Cloud NAT, Cloud SQL, Shared VPC
+- ✅ Terraform modular design with reusable abstractions
+- ✅ Remote state management with GCS backend + state locking
+- ✅ GitHub Actions CI/CD for Terraform (path-filtered monorepo, PR plan comments)
+- ✅ Workload Identity Federation & OIDC for secretless authentication
+- ✅ Multi-cloud IaC patterns (GCP provider + DigitalOcean provider)
 - ✅ CI/CD pipelines with GitHub Actions
 - ✅ Cloud deployment to Azure App Service
 - ✅ Git version control mastery (branching, rebasing, stashing, etc.)

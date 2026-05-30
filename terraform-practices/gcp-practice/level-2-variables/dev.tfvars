@@ -1,4 +1,4 @@
-project_id     = "test-project-18792"
+project_id     = "your-project-id"
 environment    = "dev"
-sandbox_suffix = "adarsh-sandbox-101"
+sandbox_suffix = "yourname-sandbox-101"
 region         = "asia-south1"

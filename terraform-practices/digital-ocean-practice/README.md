@@ -1,121 +1,112 @@
-# Terraform Practices
+# DigitalOcean Terraform Practices
 
 ![Terraform](https://img.shields.io/badge/Terraform-Practices-7B42BC?style=flat-square&logo=terraform&logoColor=white)
 ![DigitalOcean](https://img.shields.io/badge/DigitalOcean-Provider-0080FF?style=flat-square&logo=digitalocean&logoColor=white)
+![IaC](https://img.shields.io/badge/IaC-Modular-00ADD8?style=flat-square&logo=terraform&logoColor=white)
 
-This directory contains **Terraform Infrastructure-as-Code (IaC)** practices using the **DigitalOcean** provider. The project demonstrates modular infrastructure design, multi-environment setups, and key Terraform concepts.
+This directory contains **Terraform Infrastructure-as-Code (IaC)** practices using the **DigitalOcean** provider. The project demonstrates **modular module composition**, **multi-environment provisioning**, and **infrastructure refactoring** — progressing from flat resources to reusable components.
 
 ---
 
-## What I Practiced
+## Learning Path
 
-### 🧱 Modular Architecture
+| Area | Module | What You'll Learn | Theme |
+|------|--------|-------------------|-------|
+| 🟢 Networking | `network_layer` | VPC creation, firewall rules, environment tagging | The Network Architect |
+| 🟢 Compute | `app_cluster` | Droplet provisioning, VPC attachment, multi-env deployment | The Compute Runner |
+| 🟠 Orchestration | Root Module | Module composition, state management, `moved` blocks | The Orchestrator |
 
-The infrastructure is organized into reusable **Terraform modules**:
+---
 
-```
-terraform-practices/
-├── main.tf                    # Root module — orchestrates sub-modules
-├── providers.tf               # Provider configuration & state migration
-├── terraform.tfvars           # Variable values
-├── modules/
-│   ├── network_layer/         # VPC, firewall, tags
-│   │   ├── network.tf         # VPC + firewall resources
-│   │   ├── variables.tf       # Module inputs
-│   │   └── outputs.tf         # Module outputs (vpc_id)
-│   └── app_cluster/           # Compute resources
-│       ├── droplet.tf         # DigitalOcean Droplet
-│       ├── variables.tf       # Module inputs (name, region, size, vpc_id)
-│       └── outputs.tf         # Module outputs
-```
+## Module 1: Network Layer (The Network Architect)
 
-### 🌍 Multi-Environment Setup
+**Folder:** `modules/network_layer/`
 
-Two environments provisioned via the same modules:
+**What I Practiced:**
+- Creating isolated VPCs with custom IP ranges (`10.0.0.0/16` dev, `10.1.0.0/16` prod)
+- Configuring inbound firewall rules (SSH port 22, HTTP port 80) with IPv4 + IPv6
+- Configuring outbound firewall rules (all TCP/UDP)
+- Environment tagging (`devlopment`, `production`) for resource grouping and firewall targeting
 
-| Environment | VPC Name | IP Range | Droplet(s) | Tags |
-|-------------|----------|----------|------------|------|
-| **Development** | `devlopment-vpc` | `10.0.0.0/16` | `dev-web-1`, `dev-web-2` | `devlopment` |
-| **Production** | `production-vpc` | `10.1.0.0/16` | `prod-web-1` | `production` |
+**Files:**
+| File | Purpose |
+|------|---------|
+| `network.tf` | VPC, tag, and firewall resource definitions |
+| `variables.tf` | Module input variables (env_name, ip_range, region, firewall_name) |
+| `outputs.tf` | Exposed outputs (vpc_id) |
 
-### 🔥 Firewall Rules
-
-The `network_layer` module creates a firewall with:
-
-| Direction | Protocol | Port | Source/Dest |
-|-----------|----------|------|-------------|
-| Inbound | TCP | 22 (SSH) | `0.0.0.0/0`, `::/0` |
-| Inbound | TCP | 80 (HTTP) | `0.0.0.0/0`, `::/0` |
-| Outbound | TCP | 1-65535 | `0.0.0.0/0`, `::/0` |
-| Outbound | UDP | 1-65535 | `0.0.0.0/0`, `::/0` |
-
-### 🔄 State Migration
-
-Uses Terraform's `moved` blocks to refactor infrastructure without recreation:
-
+**Quick Reference:**
 ```hcl
-moved {
-  from = digitalocean_vpc.custom_vpc
-  to   = module.development_cluster.digitalocean_vpc.custom_vpc
+module "dev-network" {
+  source       = "./modules/network_layer"
+  env_name     = "devlopment"
+  ip_range     = "10.0.0.0/16"
+  region       = "blr1"
+  firewall_name = "devlopment-firewall"
 }
 ```
 
-This demonstrates **refactoring** infrastructure from flat resources into modules.
-
 ---
 
-## Files Explained
+## Module 2: App Cluster (The Compute Runner)
 
+**Folder:** `modules/app_cluster/`
+
+**What I Practiced:**
+- Provisioning DigitalOcean Droplets (Ubuntu 24.04) inside a VPC
+- Attaching droplets to an existing network via `vpc_uuid`
+- Using tags for automatic firewall association
+- Deploying multiple droplets for dev (`dev-web-1`, `dev-web-2`) and single droplet for prod (`prod-web-1`)
+
+**Files:**
 | File | Purpose |
 |------|---------|
-| `providers.tf` | Declares DigitalOcean provider, required version, and `moved` blocks |
-| `main.tf` | Root module — instantiates network and app_cluster modules for dev & prod |
-| `terraform.tfvars` | Variable values for the configuration |
-| `terraform.tfstate` | State file tracking real-world resources |
-| `terraform.tfstate.backup` | Automatic state backup |
+| `droplet.tf` | Droplet resource definition |
+| `variables.tf` | Module input variables (droplet_name, region, droplet_size, tags, vpc_id) |
+| `outputs.tf` | Exposed outputs (server_public_ip) |
+
+**Quick Reference:**
+```hcl
+module "dev-cluster_1" {
+  source       = "./modules/app_cluster"
+  droplet_name = "dev-web-1"
+  region       = "blr1"
+  droplet_size = "s-1vcpu-1gb"
+  vpc_id       = module.dev-network.vpc_id
+  tags         = ["devlopment"]
+}
+```
+
+---
+
+## Module 3: Root Orchestrator (The Orchestrator)
+
+**Folder:** `.` (root)
+
+**What I Practiced:**
+- Composing multiple modules with inter-module dependencies (`vpc_id` chaining)
+- Multi-environment orchestration via variable-driven module inputs
+- Infrastructure refactoring with Terraform `moved` blocks
+- Provider configuration with version constraints
+
+**Files:**
+| File | Purpose |
+|------|---------|
+| `main.tf` | Root module — instantiates network_layer and app_cluster for dev & prod |
+| `providers.tf` | DigitalOcean provider declaration + `moved` blocks for state migration |
+| `terraform.tfvars` | Variable values |
 | `.terraform.lock.hcl` | Provider version lock file |
-| `modules/network_layer/network.tf` | VPC, tag, and firewall resource definitions |
-| `modules/network_layer/variables.tf` | Input variables for the network module |
-| `modules/network_layer/outputs.tf` | Outputs (vpc_id, env_tag) |
-| `modules/app_cluster/droplet.tf` | DigitalOcean Droplet resource |
-| `modules/app_cluster/variables.tf` | Input variables for the app cluster module |
-| `modules/app_cluster/outputs.tf` | Outputs |
 
----
+**Resources Provisioned:**
+| Resource | Count | Purpose |
+|----------|-------|---------|
+| `digitalocean_vpc` | 2 | Dev VPC (10.0.0.0/16), Prod VPC (10.1.0.0/16) |
+| `digitalocean_tag` | 2 | `devlopment`, `production` |
+| `digitalocean_firewall` | 2 | Dev firewall, Prod firewall |
+| `digitalocean_droplet` | 3 | dev-web-1, dev-web-2, prod-web-1 |
 
-## Resources Provisioned
-
-| Resource | Description | Provider |
-|----------|-------------|----------|
-| `digitalocean_vpc` | Virtual Private Cloud (isolated network) | DigitalOcean |
-| `digitalocean_tag` | Environment tag for resource grouping | DigitalOcean |
-| `digitalocean_firewall` | Firewall with inbound/outbound rules | DigitalOcean |
-| `digitalocean_droplet` | Virtual machine (Ubuntu 24.04) | DigitalOcean |
-
----
-
-## Key Terraform Concepts Demonstrated
-
-| Concept | Where |
-|---------|-------|
-| ✅ **Modules** | Reusable `network_layer` and `app_cluster` modules |
-| ✅ **Variables** | Input variables with types, descriptions, and defaults |
-| ✅ **Outputs** | `vpc_id` exposed from network module to app module |
-| ✅ **Provider Configuration** | DigitalOcean provider with version constraints |
-| ✅ **State Management** | `.tfstate` and `.tfstate.backup` |
-| ✅ **Refactoring (`moved`)** | Migrating flat resources into module structure |
-| ✅ **Multi-Environment** | Dev and prod using same modules with different inputs |
-| ✅ **Resource Dependencies** | Droplet depends on VPC via `vpc_id` |
-| ✅ **Tag-based Firewall** | Firewall rules targeting tagged resources |
-
----
-
-## How to Use
-
+**Quick Reference:**
 ```bash
-# Navigate to terraform-practices
-cd terraform-practices
-
 # Initialize Terraform
 terraform init
 
@@ -125,20 +116,81 @@ terraform plan
 # Apply infrastructure
 terraform apply
 
-# Destroy resources when done
+# Destroy everything
 terraform destroy
 ```
 
-> **Note:** You need a DigitalOcean API token set as `DIGITALOCEAN_TOKEN` environment variable or configured in the provider.
+> **Note:** Requires a DigitalOcean API token set as `DIGITALOCEAN_TOKEN` environment variable.
+
+---
+
+## Environment Summary
+
+| Environment | VPC Name | IP Range | Region | Droplet(s) | Size | Firewall |
+|-------------|----------|----------|--------|------------|------|----------|
+| **Development** | `devlopment-vpc` | `10.0.0.0/16` | `blr1` | `dev-web-1`, `dev-web-2` | `s-1vcpu-1gb` | `devlopment-firewall` |
+| **Production** | `production-vpc` | `10.1.0.0/16` | `blr1` | `prod-web-1` | `s-1vcpu-1gb` | `prod-firewall` |
+
+---
+
+## Firewall Rules (Dev & Prod)
+
+| Direction | Protocol | Port(s) | Source/Destination |
+|-----------|----------|---------|-------------------|
+| Inbound | TCP | 22 (SSH) | `0.0.0.0/0`, `::/0` |
+| Inbound | TCP | 80 (HTTP) | `0.0.0.0/0`, `::/0` |
+| Outbound | TCP | 1–65535 | `0.0.0.0/0`, `::/0` |
+| Outbound | UDP | 1–65535 | `0.0.0.0/0`, `::/0` |
+
+---
+
+## State Migration (Refactoring with `moved`)
+
+The `providers.tf` file contains `moved` blocks that demonstrate how to refactor infrastructure from flat resources into a module structure without destroying and recreating resources:
+
+```hcl
+moved {
+  from = digitalocean_vpc.custom_vpc
+  to   = module.development_cluster.digitalocean_vpc.custom_vpc
+}
+
+moved {
+  from = digitalocean_droplet.web_server
+  to   = module.development_cluster.digitalocean_droplet.web_server
+}
+
+moved {
+  from = digitalocean_firewall.web_firewall
+  to   = module.development_cluster.digitalocean_firewall.web_firewall
+}
+```
+
+This allows Terraform to track that existing cloud resources have been reorganized into the new module hierarchy — no resource recreation needed.
+
+---
+
+## Key Terraform Concepts Demonstrated
+
+| Concept | Where |
+|---------|-------|
+| ✅ **Reusable Modules** | `network_layer` and `app_cluster` modules called from root |
+| ✅ **Module Composition** | Droplet module consumes VPC output (`vpc_id`) from network module |
+| ✅ **Multi-Environment** | Same modules, different variable values for dev and prod |
+| ✅ **Variables & Outputs** | Typed inputs with descriptions, exposed outputs for chaining |
+| ✅ **Provider Configuration** | `digitalocean/digitalocean` provider with `~> 2.0` version constraint |
+| ✅ **Refactoring (`moved`)** | Migrating flat resources into modules with zero downtime |
+| ✅ **Tag-based Firewall** | Firewall rules target droplets by environment tag |
+| ✅ **State Management** | `.tfstate` and `.tfstate.backup` for tracking |
 
 ---
 
 ## Skills Practiced
 
-- ✅ Writing reusable Terraform modules
-- ✅ Multi-environment infrastructure management
-- ✅ DigitalOcean cloud resource provisioning
-- ✅ Network and security group configuration
-- ✅ Infrastructure refactoring with `moved` blocks
-- ✅ Variable-driven configuration
-- ✅ State file management
+- [x] Writing reusable Terraform modules with clean interfaces
+- [x] Multi-environment infrastructure orchestration
+- [x] DigitalOcean cloud resource provisioning (VPC, Droplet, Firewall, Tag)
+- [x] Network security group configuration
+- [x] Infrastructure refactoring with `moved` blocks
+- [x] Variable-driven configuration across environments
+- [x] Module dependency chaining (output-to-input wiring)
+- [x] State file management and understanding

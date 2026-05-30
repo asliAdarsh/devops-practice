@@ -1,4 +1,4 @@
-project_id     = "test-project-18792"
+project_id     = "your-gcp-project-id"
 environment    = "dev"
 vpc_name      = "custom-vpc-dev"
 region         = "asia-south1"
