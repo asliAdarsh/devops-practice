@@ -14,8 +14,8 @@ resource "google_project_service" "spoke_compute_api" {
   disable_on_destroy = false
 }
 resource "google_compute_shared_vpc_host_project" "hub_host" {
-  provider = google.hub
-  project  = var.hub_project_id
+  provider   = google.hub
+  project    = var.hub_project_id
   depends_on = [google_project_service.hub_compute_api]
 }
 
@@ -42,5 +42,5 @@ resource "google_compute_shared_vpc_service_project" "spoke_attachment" {
   depends_on = [
     google_compute_shared_vpc_host_project.hub_host,
     google_project_service.spoke_compute_api
-    ]
+  ]
 }
