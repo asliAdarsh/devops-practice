@@ -177,6 +177,10 @@ Full-stack **Totes App (Todo & Notes)** — the capstone project:
 
 **Adarsh** — DevOps learner & practitioner
 
+## 📜 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
 ---
 
 *This is a personal learning repository. Feel free to explore and use it as a reference for your own DevOps journey!*
