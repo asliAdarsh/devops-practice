@@ -1,9 +1,9 @@
 variable "hub_project_id" {
-  type    = string
+  type = string
 }
 
 variable "spoke_project_id" {
-  type    = string
+  type = string
 }
 variable "region" {
   type    = string
