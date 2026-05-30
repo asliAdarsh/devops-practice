@@ -1,6 +1,22 @@
+# Enable Compute Engine API inside Hub Project
+resource "google_project_service" "hub_compute_api" {
+  provider           = google.hub
+  project            = var.hub_project_id
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+# Enable Compute Engine API inside Spoke Project (Required for service project link)
+resource "google_project_service" "spoke_compute_api" {
+  provider           = google.spoke
+  project            = var.spoke_project_id
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
 resource "google_compute_shared_vpc_host_project" "hub_host" {
   provider = google.hub
   project  = var.hub_project_id
+  depends_on = [google_project_service.hub_compute_api]
 }
 
 resource "google_compute_network" "shared_vpc" {
@@ -23,5 +39,8 @@ resource "google_compute_shared_vpc_service_project" "spoke_attachment" {
   host_project    = var.hub_project_id
   service_project = var.spoke_project_id
 
-  depends_on = [google_compute_shared_vpc_host_project.hub_host]
+  depends_on = [
+    google_compute_shared_vpc_host_project.hub_host,
+    google_project_service.spoke_compute_api
+    ]
 }
