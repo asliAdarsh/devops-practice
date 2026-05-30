@@ -1,0 +1,44 @@
+name: "Level 14: The Master Key (Secretless GitOps Engine)"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform-practices/gcp-practice/level-14-master-key/**'
+
+permissions:
+  id-token: write # Required by GitHub to request the secure OIDC JWT token
+  contents: read  # Allows the action runner to read the repository code files
+
+jobs:
+  secretless_deploy:
+    name: "Keyless Tokenized Run"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform-practices/gcp-practice/level-14-master-key
+
+    steps:
+      - name: "1. Checkout Source Code"
+        uses: actions/checkout@v4
+
+      - name: "2. Authenticate to Google Cloud via OIDC"
+        uses: google-github-actions/auth@v2
+        with:
+          # You get this string from running your Level 14 Terraform output
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER_STRING }}
+          service_account: ${{ secrets.GCP_WIF_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: "3. Setup HashiCorp Terraform CLI"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+          terraform_wrapper: false
+
+      - name: "4. Initialize State Connection"
+        run: terraform init
+
+      - name: "5. Execute Live Production Apply"
+        run: terraform apply -auto-approve -input=false

@@ -1,0 +1,74 @@
+name: "Level 13: The Guardian Pipeline (GitOps Automation)"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform-practices/gcp-practice/level-13-guardian/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform-practices/gcp-practice/level-13-guardian/**'
+
+jobs:
+  guardian:
+    name: "Infrastructure Validation Gate"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform-practices/gcp-practice/level-13-guardian
+
+    steps:
+      - name: "1. Checkout Source Code"
+        uses: actions/checkout@v4
+
+      - name: "2. Authenticate securely to Google Cloud"
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: "3. Setup HashiCorp Terraform CLI"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.0
+          terraform_wrapper: true # Required to capture outputs for step 7
+
+      - name: "4. Configure Terraform Environment Wrapper"
+        run: echo "TF_IN_AUTOMATION=true" >> $GITHUB_ENV
+
+      - name: "5. Check Code Formatting Syntax"
+        run: terraform fmt -check
+
+      - name: "6. Initialize and Validate State"
+        run: |
+          terraform init
+          terraform validate
+
+      - name: "7. Generate Speculative Plan"
+        id: plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color -input=false
+
+      # =====================================================================
+      # MINIMIZED STEP 7: CLEAN PR PLAN COMMENTER
+      # =====================================================================
+      - name: "8. Publish Plan to PR Feed"
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### 📊 Speculative Terraform Execution Plan\n<details><summary>View Details</summary>\n\n\`\`\`hcl\n${process.env.TF_PLAN}\n\`\`\`\n\n</details>`
+            })
+        env:
+          TF_PLAN: "${{ steps.plan.outputs.stdout }}"
+
+      - name: "9. Execute Live Production Apply"
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
